@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endale Store</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+</head>
+
+<body>
+    <header class="header">
+        <a class="logo" href="/">Endale Store</a>
+        <nav>
+            <a href="#products">Products</a>
+            <a href="#cart">Cart (<span id="cart-count">0</span>)</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <p class="eyebrow">WELCOME TO OUR STORE</p>
+            <h1>Find your next favorite product.</h1>
+            <p>Explore our products and add your favorites to your cart.</p>
+            <a class="shop-button" href="#products">Shop now</a>
+        </section>
+<!-- CUSTOMER AUTHENTICATION -->
+<section id="authentication" class="auth-section">
+    <h2>Customer Account</h2>
+    <p>Create an account or log in to manage your shopping.</p>
+
+    <div class="auth-grid">
+
+        <!-- LOGIN FORM -->
+        <form id="login-form" class="auth-card">
+            <h3>Customer Login</h3>
+
+            <div class="form-group">
+                <label for="login-email">Email Address</label>
+                <input type="email" id="login-email" autocomplete="email" placeholder="you@example.com" maxlength="254"
+                    required />
+            </div>
+
+            <div class="form-group">
+                <label for="login-password">Password</label>
+                <input type="password" id="login-password" autocomplete="current-password"
+                    placeholder="Enter your password" required />
+            </div>
+
+            <button type="submit" id="login-button">
+                Login
+            </button>
+
+            <p id="login-message" role="status" aria-live="polite"></p>
+        </form>
+
+        <!-- REGISTRATION FORM -->
+        <form id="register-form" class="auth-card">
+            <h3>Create Account</h3>
+
+            <div class="form-group">
+                <label for="register-name">Full Name</label>
+                <input type="text" id="register-name" autocomplete="name" placeholder="Your full name" minlength="2"
+                    maxlength="100" required />
+            </div>
+
+            <div class="form-group">
+                <label for="register-email">Email Address</label>
+                <input type="email" id="register-email" autocomplete="email" placeholder="you@example.com"
+                    maxlength="254" required />
+            </div>
+
+            <div class="form-group">
+                <label for="register-password">Password</label>
+                <input type="password" id="register-password" autocomplete="new-password"
+                    placeholder="At least 8 characters" minlength="8" maxlength="72" required />
+            </div>
+
+            <button type="submit" id="register-button">
+                Create Account
+            </button>
+
+            <p id="register-message" role="status" aria-live="polite"></p>
+        </form>
+
+    </div>
+
+    <!-- LOGGED-IN CUSTOMER -->
+    <div id="customer-account" class="auth-card" hidden>
+        <h3>My Account</h3>
+        <p>Welcome, <strong id="account-name"></strong>!</p>
+        <p>Email: <span id="account-email"></span></p>
+
+        <button type="button" id="logout-button">
+            Logout
+        </button>
+    </div>
+</section>
+
+        <section id="products">
+            <h2>Our Products</h2>
+            <p id="status">Loading products...</p>
+            <div id="product-list" class="product-grid"></div>
+        </section>
+
+        <section class="product-controls">
+            <input id="searchInput" type="search" placeholder="Search products..." aria-label="Search products" />
+        
+            <input id="minPrice" type="number" min="0" placeholder="Minimum price" aria-label="Minimum price" />
+        
+            <input id="maxPrice" type="number" min="0" placeholder="Maximum price" aria-label="Maximum price" />
+        
+            <select id="sortSelect" aria-label="Sort products">
+                <option value="">Default order</option>
+                <option value="name_asc">Name: A to Z</option>
+                <option value="name_desc">Name: Z to A</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+            </select>
+        
+            <button id="filterButton" type="button">Apply filters</button>
+            <button id="resetButton" type="button">Reset</button>
+        </section>
+        
+        <p id="productMessage" role="status" aria-live="polite"></p>
+        
+        <section id="cart">
+            <h2>Your Shopping Cart</h2>
+        
+            <div id="cart-items"></div>
+        
+            <p>
+                Total:
+                <strong><span id="cart-total">0.00</span> ETB</strong>
+            </p>
+        
+            <button id="clear-cart" type="button">Clear Cart</button>
+        </section>
+        <!-- Checkout Section -->
+        <section id="checkout">
+            <h2>Checkout</h2>
+            <p>Enter your details to place your order.</p>
+        
+            <form id="checkout-form">
+                <div class="form-group">
+                    <label for="customerName">Full Name</label>
+                    <input type="text" id="customerName" name="customerName" placeholder="Enter your full name" minlength="2"
+                        maxlength="100" autocomplete="name" required />
+                </div>
+        
+                <div class="form-group">
+                    <label for="customerEmail">Email Address</label>
+                    <input type="email" id="customerEmail" name="customerEmail" placeholder="you@example.com" maxlength="254"
+                        autocomplete="email" required />
+                </div>
+        
+                <div class="form-group">
+                    <label for="customerPhone">Phone Number</label>
+                    <input type="tel" id="customerPhone" name="customerPhone" placeholder="Enter your phone number"
+                        minlength="7" maxlength="20" autocomplete="tel" required />
+                </div>
+        
+                <div class="form-group">
+                    <label for="deliveryAddress">Delivery Address</label>
+                    <textarea id="deliveryAddress" name="deliveryAddress" placeholder="Enter your complete delivery address"
+                        minlength="5" maxlength="500" autocomplete="street-address" rows="4" required></textarea>
+                </div>
+        
+                <button type="submit" id="place-order-button">
+                    Place Order
+                </button>
+        
+                <p id="checkout-message" role="status" aria-live="polite"></p>
+            </form>
+        </section>
+        <!-- MY ORDERS SECTION -->
+        <section id="my-orders">
+            <h2>My Orders</h2>
+            <p>Enter your checkout email address to view your orders.</p>
+        
+            <form id="order-search-form">
+                <div class="form-group">
+                    <label for="order-email">Email Address</label>
+                    <input type="email" id="order-email" placeholder="Enter your checkout email" maxlength="254"
+                        autocomplete="email" required />
+                </div>
+        
+                <button type="submit" id="find-orders-button">
+                    Find My Orders
+                </button>
+            </form>
+        
+            <p id="order-history-message" role="status" aria-live="polite"></p>
+        
+            <div id="order-history-list"></div>
+        
+            <div id="order-details"></div>
+        </section>
+       
+
+
+
+    </main>
+
+    <footer>
+        <p>CodeAlpha E-commerce Store — Learning Project</p>
+    </footer>
+</body>
+
+</html>
