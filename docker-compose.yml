@@ -1,7 +1,12 @@
+
 services:
   backend:
     build:
       context: ./backend
+    volumes:
+      - product_uploads:/app/uploads
+    ports:
+      - "3000:3000"
     environment:
       NODE_ENV: production
       PORT: 3000
@@ -11,6 +16,7 @@ services:
       DB_USER: ${MYSQL_USER}
       DB_PASSWORD: ${MYSQL_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
+      CHAPA_SECRET_KEY: ${CHAPA_SECRET_KEY}
     depends_on:
       db:
         condition: service_healthy
@@ -49,3 +55,4 @@ services:
 
 volumes:
   mysql_data:
+  product_uploads:

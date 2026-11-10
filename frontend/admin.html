@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Endale Store</title>
+    <link rel="stylesheet" href="admin.css">
+    <script src="admin.js" defer></script>
+</head>
+
+<body>
+
+    <div class="admin-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+
+            <a href="index.html" class="brand">
+                <span class="brand-icon">E</span>
+                Endale<span>Store</span>
+            </a>
+
+            <p class="sidebar-label">MAIN MENU</p>
+
+            <nav class="sidebar-nav">
+
+                <a href="#overview" class="nav-link active">
+                    <span>▦</span> Dashboard
+                </a>
+
+                <a href="#products" class="nav-link">
+                    <span>▣</span> Products
+                </a>
+
+                <a href="#users" class="nav-link owner-only" id="users-nav-link" hidden>
+                    <span>♙</span> User Management
+                </a>
+
+            </nav>
+
+            <div class="sidebar-bottom">
+                <p>ADMIN PANEL</p>
+                <a href="index.html" class="nav-link">
+                    <span>↗</span> Customer Store
+                </a>
+            </div>
+
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+
+            <!-- TOPBAR -->
+            <header class="topbar">
+
+                <button id="menu-toggle" class="menu-toggle" aria-label="Toggle navigation">
+                    ☰
+                </button>
+
+                <div>
+                    <h2>Store Dashboard</h2>
+                    <p>Manage your store and products</p>
+                </div>
+
+                <div class="admin-profile">
+                    <div class="avatar" id="profile-avatar">A</div>
+                    <div>
+                        <strong id="profile-role">Administrator</strong>
+                        <small>Store Management</small>
+                    </div>
+                </div>
+
+            </header>
+
+            <!-- DASHBOARD OVERVIEW -->
+            <section id="overview" class="content-section">
+
+                <div class="page-heading">
+                    <div>
+                        <h1>Dashboard Overview</h1>
+                        <p>Welcome to your store management panel.</p>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+
+                    <article class="stat-card">
+                        <div class="stat-icon purple">▣</div>
+                        <p>Total Products</p>
+                        <h2 id="total-products">—</h2>
+                        <small>Product inventory</small>
+                    </article>
+
+                    <article class="stat-card">
+                        <div class="stat-icon green">✓</div>
+                        <p>Available Products</p>
+                        <h2 id="available-products">—</h2>
+                        <small>Products in stock</small>
+                    </article>
+
+                    <article class="stat-card">
+                        <div class="stat-icon orange">!</div>
+                        <p>Out of Stock</p>
+                        <h2 id="out-of-stock">—</h2>
+                        <small>Products requiring attention</small>
+                    </article>
+
+                </div>
+
+            </section>
+
+            <!-- PRODUCT MANAGEMENT -->
+            <section id="products" class="content-section">
+
+                <div class="section-toolbar">
+                    <div>
+                        <h2>Product Management</h2>
+                        <p>View, add, edit, and manage store products.</p>
+                    </div>
+
+                    <button class="primary-button" id="open-add-modal">
+                        + Add Product
+                    </button>
+                </div>
+
+                <div class="table-card">
+
+                    <div class="table-heading">
+                        <h3>All Products</h3>
+                        <input type="search" id="product-search" placeholder="Search products...">
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="admin-product-list">
+                                <tr>
+                                    <td colspan="6" class="empty-state">
+                                        Loading products...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- OWNER: USER MANAGEMENT -->
+            <section id="users" class="content-section owner-only" hidden>
+
+                <div class="section-toolbar">
+                    <div>
+                        <h2>User Management</h2>
+                        <p>Manage customer and administrator accounts.</p>
+                    </div>
+
+                    <button type="button" class="secondary-button" id="refresh-users">
+                        ↻ Refresh Users
+                    </button>
+                </div>
+
+                <!-- USER STATISTICS -->
+                <div class="stats-grid user-stats-grid">
+
+                    <article class="stat-card">
+                        <div class="stat-icon purple">♙</div>
+                        <p>Total Users</p>
+                        <h2 id="total-users">0</h2>
+                        <small>All registered accounts</small>
+                    </article>
+
+                    <article class="stat-card">
+                        <div class="stat-icon green">✓</div>
+                        <p>Administrators</p>
+                        <h2 id="total-admins">0</h2>
+                        <small>Store administrators</small>
+                    </article>
+
+                    <article class="stat-card">
+                        <div class="stat-icon orange">♙</div>
+                        <p>Customers</p>
+                        <h2 id="total-customers">0</h2>
+                        <small>Customer accounts</small>
+                    </article>
+
+                </div>
+
+                <!-- USER TABLE -->
+                <div class="table-card user-table-card">
+
+                    <div class="table-heading user-table-heading">
+                        <div>
+                            <h3>Registered Users</h3>
+                            <p>Promote customers or demote administrators.</p>
+                        </div>
+
+                        <div class="user-filters">
+
+                            <input type="search" id="user-search" placeholder="Search name or email...">
+
+                            <select id="role-filter">
+                                <option value="all">All Roles</option>
+                                <option value="customer">Customers</option>
+                                <option value="admin">Administrators</option>
+                                <option value="owner">Owner</option>
+                            </select>
+
+                        </div>
+                    </div>
+
+                    <div id="user-message" class="user-message" role="status" aria-live="polite">
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Registered</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="admin-user-list">
+                                <tr>
+                                    <td colspan="6" class="empty-state">
+                                        Loading users...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- ADD PRODUCT MODAL -->
+    <div class="modal-overlay" id="product-modal">
+
+        <div class="modal">
+
+            <div class="modal-header">
+                <div>
+                    <h2 id="modal-title">Add New Product</h2>
+                    <p>Enter the product information below.</p>
+                </div>
+
+                <button id="close-modal" class="close-button" aria-label="Close">
+                    ×
+                </button>
+            </div>
+
+            <form id="product-form">
+
+                <input type="hidden" id="product-id">
+
+                <div class="form-group">
+                    <label for="product-name">Product Name</label>
+                    <input type="text" id="product-name" placeholder="Enter product name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-description">Description</label>
+                    <textarea id="product-description" placeholder="Enter product description">
+                    </textarea>
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label for="product-price">Price (ETB)</label>
+                        <input type="number" id="product-price" min="0.01" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product-stock">Stock</label>
+                        <input type="number" id="product-stock" min="0" step="1" required>
+                    </div>
+
+                </div>
+
+            <div class="form-group">
+                <label for="product-image-file">Upload Product Image</label>
+            
+                <input type="file" id="product-image-file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+            
+                <small>JPG, JPEG, or PNG, WebP. Maximum size: 5 MB.</small>
+            
+                <img id="product-image-preview" class="product-image-preview" alt="Selected product image preview" hidden>
+            </div>
+            
+            <div class="form-group">
+                <label for="product-image">Or use an Image URL</label>
+            
+                <input type="url" id="product-image" placeholder="https://example.com/image.jpg">
+            </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="cancel-button" id="cancel-modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="primary-button">
+                        Save Product
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

@@ -168,6 +168,7 @@ async function loadProducts() {
 // 6. DISPLAY PRODUCTS
 // ============================================
 
+
 function renderProducts(productsToRender = products) {
     productList.innerHTML = "";
 
@@ -179,35 +180,54 @@ function renderProducts(productsToRender = products) {
     productsToRender.forEach((product) => {
         const stock = Number(product.stock);
         const price = Number(product.price);
-        const article = document.createElement("article");
 
+        const article = document.createElement("article");
         article.className = "product-card";
 
         article.innerHTML = `
-            <img
-                src="${escapeHTML(product.image)}"
-                alt="${escapeHTML(product.name)}"
-                loading="lazy"
-            />
+            <div class="product-image-wrapper">
+                ${product.image
+                ? `
+                            <img
+                                src="${escapeHTML(product.image)}"
+                                alt="${escapeHTML(product.name)}"
+                                loading="lazy"
+                            />
+                        `
+                : `
+                            <div class="product-image-placeholder">
+                                No image available
+                            </div>
+                        `
+            }
+            </div>
 
-            <h3>${escapeHTML(product.name)}</h3>
+            <div class="product-content">
+                <h3>${escapeHTML(product.name)}</h3>
 
-            <p>${escapeHTML(product.description)}</p>
+                <p class="product-description">
+                    ${escapeHTML(product.description || "No description available.")}
+                </p>
 
-            <p class="product-price">
-                Price: ${price.toFixed(2)} ETB
-            </p>
+                <div class="product-details">
+                    <span class="product-price">
+                        ${Number.isFinite(price) ? price.toFixed(2) : "0.00"} ETB
+                    </span>
 
-            <p>Stock: ${stock}</p>
+                    <span class="product-stock ${stock > 0 ? "in-stock" : "out-of-stock"}">
+                        ${stock > 0 ? `${stock} available` : "Out of stock"}
+                    </span>
+                </div>
 
-            <button
-                type="button"
-                class="add-to-cart"
-                data-id="${Number(product.id)}"
-                ${stock <= 0 ? "disabled" : ""}
-            >
-                ${stock <= 0 ? "Out of stock" : "Add to cart"}
-            </button>
+                <button
+                    type="button"
+                    class="add-to-cart"
+                    data-id="${Number(product.id)}"
+                    ${stock <= 0 ? "disabled" : ""}
+                >
+                    ${stock <= 0 ? "Out of Stock" : "Add to Cart"}
+                </button>
+            </div>
         `;
 
         productList.appendChild(article);
@@ -410,7 +430,7 @@ function renderCart() {
     );
 
     cartCountElement.textContent = totalItems;
-    cartTotalElement.textContent = `${totalPrice.toFixed(2)} ETB`;
+    cartTotalElement.textContent = totalPrice.toFixed(2);
 
     if (cart.length === 0) {
         cartItemsElement.textContent = "Your cart is empty.";
@@ -516,42 +536,40 @@ function showCheckoutMessage(message) {
 }
 
 // Handle checkout form submission.
+
+
 async function handleCheckout(event) {
-    // Prevent the browser from refreshing the page.
     event.preventDefault();
 
-    // Prevent duplicate submissions.
     if (isSubmittingOrder) {
         return;
     }
 
-    // Check whether the shopping cart is empty.
     if (cart.length === 0) {
         showCheckoutMessage("Your cart is empty. Add products first.");
         return;
     }
 
-    // Collect customer information.
     const orderData = {
         customerName: document.getElementById("customerName").value.trim(),
         customerEmail: document.getElementById("customerEmail").value.trim(),
         customerPhone: document.getElementById("customerPhone").value.trim(),
-        deliveryAddress: document.getElementById("deliveryAddress").value.trim(),
-
-        // Send product IDs and quantities only.
+        deliveryStreet: document.getElementById("deliveryStreet").value.trim(),
+        deliveryCity: document.getElementById("deliveryCity").value.trim(),
+        deliveryArea: document.getElementById("deliveryArea").value.trim(),
+        deliveryLocationUrl: document.getElementById("deliveryLocationUrl").value.trim(),
+        deliveryInstructions: document.getElementById("deliveryInstructions").value.trim(),
         items: cart.map((item) => ({
             productId: Number(item.id),
             quantity: Number(item.quantity)
         }))
     };
 
-    // Save the original button text.
     const originalButtonText = placeOrderButton.textContent;
 
     try {
         isSubmittingOrder = true;
 
-        // Disable buttons that could change the cart.
         placeOrderButton.disabled = true;
         clearCartButton.disabled = true;
 
@@ -568,56 +586,74 @@ async function handleCheckout(event) {
             });
 
         placeOrderButton.textContent = "Processing...";
-        showCheckoutMessage("Submitting your order. Please wait...");
 
-        // Send the order to the Express backend.
-        const response = await fetch("/api/orders", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(orderData)
-        });
+        // Reuse an order if payment initialization previously failed.
+        let orderId = sessionStorage.getItem("pendingPaymentOrderId");
 
-        // Convert the server response into JavaScript data.
-        const result = await response.json();
+        if (!orderId) {
+            showCheckoutMessage("Creating your order...");
 
-        // Handle unsuccessful HTTP responses.
-        if (!response.ok) {
+            const orderResponse = await fetch("/api/orders", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(orderData)
+            });
+
+            const orderResult = await orderResponse.json();
+
+            if (!orderResponse.ok) {
+                throw new Error(
+                    orderResult.message || "Unable to create your order."
+                );
+            }
+
+            orderId = String(orderResult.order.id);
+
+            sessionStorage.setItem("pendingPaymentOrderId", orderId);
+        }
+
+        // Initialize Chapa payment.
+        showCheckoutMessage("Connecting to Chapa payment...");
+
+        const paymentResponse = await fetch(
+            "/api/payments/chapa/initialize",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    orderId: Number(orderId)
+                })
+            }
+        );
+
+        const paymentResult = await paymentResponse.json();
+
+        if (!paymentResponse.ok) {
             throw new Error(
-                result.message || "Unable to place your order."
+                paymentResult.message || "Unable to initialize payment."
             );
         }
 
-        // Clear the cart only after successful order creation.
-        cart = [];
-        saveCart();
-        renderCart();
+        if (!paymentResult.checkoutUrl) {
+            throw new Error("Chapa did not return a checkout URL.");
+        }
 
-        // Clear the customer form.
-        checkoutForm.reset();
+        showCheckoutMessage("Redirecting you to Chapa...");
 
-        // Display the order confirmation.
-        const orderNumber = result.order?.id ?? "Not provided";
-        const total = Number(result.order?.totalAmount);
-
-        showCheckoutMessage(
-            `Order placed successfully! Order number: ${orderNumber}. ` +
-            `Total: ${Number.isFinite(total) ? total.toFixed(2) : "See order details"} ETB.`
-        );
-
-        // Refresh products to show updated stock.
-        await loadProducts();
+        window.location.assign(paymentResult.checkoutUrl);
 
     } catch (error) {
-        console.error("Checkout error:", error);
+        console.error("Checkout/payment error:", error);
 
         showCheckoutMessage(
-            error.message || "Something went wrong. Please try again."
+            error.message || "Unable to process your payment. Please try again."
         );
 
     } finally {
-        // Restore the buttons after processing.
         isSubmittingOrder = false;
 
         placeOrderButton.disabled = false;
@@ -631,7 +667,6 @@ async function handleCheckout(event) {
                 button.disabled = false;
             });
 
-        // Re-enable product buttons unless their products are out of stock.
         productList
             .querySelectorAll(".add-to-cart")
             .forEach((button) => {
@@ -643,6 +678,7 @@ async function handleCheckout(event) {
             });
     }
 }
+
 
 // Listen for checkout form submission.
 checkoutForm.addEventListener("submit", handleCheckout);
@@ -681,7 +717,8 @@ function formatOrderMoney(amount) {
 
 function renderOrderHistory(orders) {
     if (!Array.isArray(orders) || orders.length === 0) {
-        orderHistoryList.innerHTML = "<p>No orders found for this email address.</p>";
+        orderHistoryList.innerHTML =
+            "<p>No orders found for this email address.</p>";
         return;
     }
 
@@ -715,9 +752,16 @@ function renderOrderHistory(orders) {
                 type="button"
                 class="view-order-button"
                 data-order-id="${escapeHTML(order.id)}"
+                aria-expanded="false"
             >
                 View Details
             </button>
+
+            <div
+                class="order-details-panel"
+                id="order-details-${escapeHTML(order.id)}"
+                hidden
+            ></div>
         </article>
     `).join("");
 }
@@ -772,7 +816,15 @@ orderSearchForm.addEventListener("submit", async (event) => {
 // ============================================
 
 async function loadOrderDetails(orderId) {
-    orderDetailsContainer.innerHTML = "<p>Loading order details...</p>";
+    const detailsPanel = document.getElementById(
+        `order-details-${orderId}`
+    );
+
+    if (!detailsPanel) {
+        return;
+    }
+
+    detailsPanel.innerHTML = "<p>Loading order details...</p>";
 
     try {
         const query = new URLSearchParams({
@@ -794,27 +846,57 @@ async function loadOrderDetails(orderId) {
         const itemRows = order.items.map((item) => `
             <tr>
                 <td>${escapeHTML(item.productName || "Unavailable product")}</td>
-                <td>${escapeHTML(item.quantity)}</td>
-                <td>${escapeHTML(formatOrderMoney(item.unitPrice))}</td>
-                <td>${escapeHTML(formatOrderMoney(item.subtotal))}</td>
+                <td class="order-number-cell">${escapeHTML(item.quantity)}</td>
+                <td class="order-money-cell">${escapeHTML(formatOrderMoney(item.unitPrice))}</td>
+                <td class="order-money-cell">${escapeHTML(formatOrderMoney(item.subtotal))}</td>
             </tr>
         `).join("");
 
-        orderDetailsContainer.innerHTML = `
-            <article class="order-details-card">
-                <h3>Order #${escapeHTML(order.id)} Details</h3>
+        let deliveryLocationHtml = "";
 
+        if (order.deliveryLocationUrl) {
+            try {
+                const locationUrl = new URL(order.deliveryLocationUrl);
+
+                if (
+                    locationUrl.protocol === "https:" ||
+                    locationUrl.protocol === "http:"
+                ) {
+                    deliveryLocationHtml = `
+                        <p>
+                            <strong>Google Maps:</strong>
+                            <a
+                                href="${escapeHTML(locationUrl.href)}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                View Delivery Location
+                            </a>
+                        </p>
+                    `;
+                }
+            } catch (error) {
+                console.warn("Invalid delivery location link.");
+            }
+        }
+
+        detailsPanel.innerHTML = `
+            <article class="order-details-card">
                 <h4>Customer Information</h4>
 
                 <p><strong>Name:</strong> ${escapeHTML(order.customerName)}</p>
                 <p><strong>Email:</strong> ${escapeHTML(order.customerEmail)}</p>
                 <p><strong>Phone:</strong> ${escapeHTML(order.customerPhone)}</p>
-                <p><strong>Delivery Address:</strong> ${escapeHTML(order.deliveryAddress)}</p>
+                <p><strong>Street / Building:</strong> ${escapeHTML(order.deliveryAddress)}</p>
+                <p><strong>City / Sub-city:</strong> ${escapeHTML(order.deliveryCity || "Not provided")}</p>
+                <p><strong>Area / Woreda:</strong> ${escapeHTML(order.deliveryArea || "Not provided")}</p>
+                ${deliveryLocationHtml}
+                <p><strong>Delivery Instructions:</strong> ${escapeHTML(order.deliveryInstructions || "None")}</p>
 
                 <h4>Order Information</h4>
 
-                <p><strong>Date:</strong> ${escapeHTML(formatOrderDate(order.createdAt))}</p>
-                <p><strong>Status:</strong> ${escapeHTML(order.status)}</p>
+                <p><strong>Order Status:</strong> ${escapeHTML(order.status)}</p>
+                <p><strong>Payment Status:</strong> ${escapeHTML(order.paymentStatus || "unpaid")}</p>
                 <p><strong>Total:</strong> ${escapeHTML(formatOrderMoney(order.totalAmount))}</p>
 
                 <h4>Purchased Products</h4>
@@ -837,9 +919,12 @@ async function loadOrderDetails(orderId) {
             </article>
         `;
 
+        detailsPanel.dataset.loaded = "true";
+
     } catch (error) {
         console.error("Order details error:", error);
-        orderDetailsContainer.innerHTML =
+
+        detailsPanel.innerHTML =
             `<p>${escapeHTML(error.message)}</p>`;
     }
 }
@@ -847,11 +932,40 @@ async function loadOrderDetails(orderId) {
 // Event delegation: handles View Details buttons
 // even after the order list is re-rendered.
 orderHistoryList.addEventListener("click", (event) => {
-    const button = event.target.closest(".view-order-button");
+    orderHistoryList.addEventListener("click", async (event) => {
+        const button = event.target.closest(".view-order-button");
 
-    if (!button || !currentOrderEmail) {
-        return;
-    }
+        if (!button || !currentOrderEmail) {
+            return;
+        }
+
+        const orderId = button.dataset.orderId;
+
+        const detailsPanel = document.getElementById(
+            `order-details-${orderId}`
+        );
+
+        if (!detailsPanel) {
+            return;
+        }
+
+        const isExpanded = button.getAttribute("aria-expanded") === "true";
+
+        if (isExpanded) {
+            detailsPanel.hidden = true;
+            button.setAttribute("aria-expanded", "false");
+            button.textContent = "View Details";
+            return;
+        }
+
+        detailsPanel.hidden = false;
+        button.setAttribute("aria-expanded", "true");
+        button.textContent = "Hide Details";
+
+        if (detailsPanel.dataset.loaded !== "true") {
+            await loadOrderDetails(orderId);
+        }
+    });
 
     loadOrderDetails(button.dataset.orderId);
 });
@@ -1020,6 +1134,16 @@ loginForm.addEventListener("submit", async (event) => {
             result.token
         );
 
+        console.log("Logged-in user:", result.user);
+        console.log("User role:", result.user?.role);
+
+        if (
+            result.user?.role === "admin" ||
+            result.user?.role === "owner"
+        ) {
+            window.location.href = "/admin.html";
+            return;
+        }
         // Display authenticated customer
         displayCustomer(result.user);
 

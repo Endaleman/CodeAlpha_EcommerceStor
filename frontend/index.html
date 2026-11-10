@@ -4,208 +4,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Endale Store</title>
+    <meta name="theme-color" content="#111827">
+
+    <title>Endale Store | Shop Smarter</title>
+
     <link rel="stylesheet" href="style.css">
     <script src="app.js" defer></script>
 </head>
 
 <body>
+
+    <!-- HEADER -->
     <header class="header">
-        <a class="logo" href="/">Endale Store</a>
-        <nav>
-            <a href="#products">Products</a>
-            <a href="#cart">Cart (<span id="cart-count">0</span>)</a>
-        </nav>
+        <div class="header-container">
+            <a class="logo" href="/">
+                <span class="logo-icon">E</span>
+                Endale<span>Store</span>
+            </a>
+
+            <nav class="main-nav">
+                <a href="#products">Products</a>
+                <a href="#cart">Shopping Cart</a>
+                <a href="#my-orders">My Orders</a>
+                <a href="#authentication" class="nav-account">My Account</a>
+            </nav>
+
+            <a class="cart-link" href="#cart">
+                <span>Cart</span>
+                <span class="cart-badge" id="cart-count">0</span>
+            </a>
+        </div>
     </header>
 
-    <main class="container">
+    <main>
+
+        <!-- HERO -->
         <section class="hero">
-            <p class="eyebrow">WELCOME TO OUR STORE</p>
-            <h1>Find your next favorite product.</h1>
-            <p>Explore our products and add your favorites to your cart.</p>
-            <a class="shop-button" href="#products">Shop now</a>
+            <div class="hero-content">
+                <span class="eyebrow">WELCOME TO ENDALE STORE</span>
+
+                <h1>Discover Products.<br>
+                    <span>Shop With Confidence.</span>
+                </h1>
+
+                <p>
+                    Find quality products, enjoy a simple shopping experience,
+                    and get everything you need in one place.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="#products" class="primary-button">Explore Products →</a>
+                    <a href="#authentication" class="secondary-button">Create Account</a>
+                </div>
+
+                <div class="hero-features">
+                    <span>✓ Easy Shopping</span>
+                    <span>✓ Secure Accounts</span>
+                    <span>✓ Simple Checkout</span>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="hero-circle">
+                    <span class="hero-emoji">🛍️</span>
+                </div>
+                <div class="floating-card">
+                    <span>✨</span>
+                    <div>
+                        <strong>Happy Shopping</strong>
+                        <small>Your store, your choice.</small>
+                    </div>
+                </div>
+            </div>
         </section>
-<!-- CUSTOMER AUTHENTICATION -->
-<section id="authentication" class="auth-section">
-    <h2>Customer Account</h2>
-    <p>Create an account or log in to manage your shopping.</p>
 
-    <div class="auth-grid">
-
-        <!-- LOGIN FORM -->
-        <form id="login-form" class="auth-card">
-            <h3>Customer Login</h3>
-
-            <div class="form-group">
-                <label for="login-email">Email Address</label>
-                <input type="email" id="login-email" autocomplete="email" placeholder="you@example.com" maxlength="254"
-                    required />
+        <!-- AUTHENTICATION -->
+        <section id="authentication" class="section auth-section">
+            <div class="section-heading">
+                <span class="eyebrow">CUSTOMER ACCOUNT</span>
+                <h2>Welcome Back</h2>
+                <p>Sign in or create an account to manage your shopping.</p>
             </div>
 
-            <div class="form-group">
-                <label for="login-password">Password</label>
-                <input type="password" id="login-password" autocomplete="current-password"
-                    placeholder="Enter your password" required />
+            <div class="auth-grid">
+
+                <!-- LOGIN -->
+                <form id="login-form" class="panel auth-card">
+                    <div class="panel-icon">🔐</div>
+                    <h3>Customer Login</h3>
+                    <p class="panel-description">Access your customer account.</p>
+
+                    <div class="form-group">
+                        <label for="login-email">Email Address</label>
+                        <input type="email" id="login-email" autocomplete="email" placeholder="you@example.com"
+                            maxlength="254" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" autocomplete="current-password"
+                            placeholder="Enter your password" required>
+                    </div>
+
+                    <button type="submit" id="login-button" class="primary-button full-button">
+                        Login to Account
+                    </button>
+
+                    <p id="login-message" class="form-message" role="status" aria-live="polite"></p>
+                </form>
+
+                <!-- REGISTER -->
+                <form id="register-form" class="panel auth-card">
+                    <div class="panel-icon">👤</div>
+                    <h3>Create Account</h3>
+                    <p class="panel-description">Join us and start shopping today.</p>
+
+                    <div class="form-group">
+                        <label for="register-name">Full Name</label>
+                        <input type="text" id="register-name" autocomplete="name" placeholder="Your full name"
+                            minlength="2" maxlength="100" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="register-email">Email Address</label>
+                        <input type="email" id="register-email" autocomplete="email" placeholder="you@example.com"
+                            maxlength="254" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="register-password">Password</label>
+                        <input type="password" id="register-password" autocomplete="new-password"
+                            placeholder="At least 8 characters" minlength="8" maxlength="72" required>
+                    </div>
+
+                    <button type="submit" id="register-button" class="primary-button full-button">
+                        Create My Account
+                    </button>
+
+                    <p id="register-message" class="form-message" role="status" aria-live="polite"></p>
+                </form>
+
             </div>
 
-            <button type="submit" id="login-button">
-                Login
-            </button>
+            <!-- LOGGED-IN CUSTOMER -->
+            <div id="customer-account" class="panel customer-account" hidden>
+                <div class="panel-icon">👋</div>
+                <h3>My Account</h3>
+                <p>Welcome, <strong id="account-name"></strong>!</p>
+                <p>Email: <span id="account-email"></span></p>
 
-            <p id="login-message" role="status" aria-live="polite"></p>
-        </form>
+                <button type="button" id="logout-button" class="secondary-button">
+                    Logout
+                </button>
+            </div>
+        </section>
 
-        <!-- REGISTRATION FORM -->
-        <form id="register-form" class="auth-card">
-            <h3>Create Account</h3>
-
-            <div class="form-group">
-                <label for="register-name">Full Name</label>
-                <input type="text" id="register-name" autocomplete="name" placeholder="Your full name" minlength="2"
-                    maxlength="100" required />
+        <!-- PRODUCTS -->
+        <section id="products" class="section products-section">
+            <div class="section-heading">
+                <span class="eyebrow">OUR COLLECTION</span>
+                <h2>Explore Our Products</h2>
+                <p>Discover products and find something you love.</p>
             </div>
 
-            <div class="form-group">
-                <label for="register-email">Email Address</label>
-                <input type="email" id="register-email" autocomplete="email" placeholder="you@example.com"
-                    maxlength="254" required />
+            <div class="product-controls">
+                <input id="searchInput" type="search" placeholder="Search products..." aria-label="Search products">
+
+                <input id="minPrice" type="number" min="0" placeholder="Min price" aria-label="Minimum price">
+
+                <input id="maxPrice" type="number" min="0" placeholder="Max price" aria-label="Maximum price">
+
+                <select id="sortSelect" aria-label="Sort products">
+                    <option value="">Default order</option>
+                    <option value="name_asc">Name: A to Z</option>
+                    <option value="name_desc">Name: Z to A</option>
+                    <option value="price_asc">Price: Low to High</option>
+                    <option value="price_desc">Price: High to Low</option>
+                </select>
+
+                <button id="filterButton" type="button" class="primary-button">
+                    Apply Filters
+                </button>
+
+                <button id="resetButton" type="button" class="secondary-button">
+                    Reset
+                </button>
             </div>
 
-            <div class="form-group">
-                <label for="register-password">Password</label>
-                <input type="password" id="register-password" autocomplete="new-password"
-                    placeholder="At least 8 characters" minlength="8" maxlength="72" required />
-            </div>
+            <p id="status" class="status-message">Loading products...</p>
+            <p id="productMessage" role="status" aria-live="polite"></p>
 
-            <button type="submit" id="register-button">
-                Create Account
-            </button>
-
-            <p id="register-message" role="status" aria-live="polite"></p>
-        </form>
-
-    </div>
-
-    <!-- LOGGED-IN CUSTOMER -->
-    <div id="customer-account" class="auth-card" hidden>
-        <h3>My Account</h3>
-        <p>Welcome, <strong id="account-name"></strong>!</p>
-        <p>Email: <span id="account-email"></span></p>
-
-        <button type="button" id="logout-button">
-            Logout
-        </button>
-    </div>
-</section>
-
-        <section id="products">
-            <h2>Our Products</h2>
-            <p id="status">Loading products...</p>
             <div id="product-list" class="product-grid"></div>
         </section>
 
-        <section class="product-controls">
-            <input id="searchInput" type="search" placeholder="Search products..." aria-label="Search products" />
-        
-            <input id="minPrice" type="number" min="0" placeholder="Minimum price" aria-label="Minimum price" />
-        
-            <input id="maxPrice" type="number" min="0" placeholder="Maximum price" aria-label="Maximum price" />
-        
-            <select id="sortSelect" aria-label="Sort products">
-                <option value="">Default order</option>
-                <option value="name_asc">Name: A to Z</option>
-                <option value="name_desc">Name: Z to A</option>
-                <option value="price_asc">Price: Low to High</option>
-                <option value="price_desc">Price: High to Low</option>
-            </select>
-        
-            <button id="filterButton" type="button">Apply filters</button>
-            <button id="resetButton" type="button">Reset</button>
+        <!-- CART -->
+        <section id="cart" class="section">
+            <div class="section-heading">
+                <span class="eyebrow">YOUR SELECTION</span>
+                <h2>Shopping Cart</h2>
+                <p>Review your selected products before checkout.</p>
+            </div>
+
+            <div class="panel cart-panel">
+                <div id="cart-items" class="cart-items"></div>
+
+                <div class="cart-summary">
+                    <div>
+                        <span>Order Total</span>
+                        <strong><span id="cart-total">0.00</span> ETB</strong>
+                    </div>
+
+                    <button id="clear-cart" type="button" class="secondary-button">
+                        Clear Cart
+                    </button>
+
+                    <a href="#checkout" class="primary-button">
+                        Proceed to Checkout →
+                    </a>
+                </div>
+            </div>
         </section>
-        
-        <p id="productMessage" role="status" aria-live="polite"></p>
-        
-        <section id="cart">
-            <h2>Your Shopping Cart</h2>
-        
-            <div id="cart-items"></div>
-        
-            <p>
-                Total:
-                <strong><span id="cart-total">0.00</span> ETB</strong>
-            </p>
-        
-            <button id="clear-cart" type="button">Clear Cart</button>
-        </section>
-        <!-- Checkout Section -->
-        <section id="checkout">
-            <h2>Checkout</h2>
-            <p>Enter your details to place your order.</p>
-        
-            <form id="checkout-form">
+
+        <!-- CHECKOUT -->
+        <section id="checkout" class="section checkout-section">
+            <div class="section-heading">
+                <span class="eyebrow">COMPLETE YOUR PURCHASE</span>
+                <h2>Checkout</h2>
+                <p>Enter your delivery details to place your order.</p>
+            </div>
+
+            <form id="checkout-form" class="panel checkout-form">
+
                 <div class="form-group">
                     <label for="customerName">Full Name</label>
-                    <input type="text" id="customerName" name="customerName" placeholder="Enter your full name" minlength="2"
-                        maxlength="100" autocomplete="name" required />
+                    <input type="text" id="customerName" name="customerName" placeholder="Enter your full name"
+                        minlength="2" maxlength="100" autocomplete="name" required>
                 </div>
-        
+
                 <div class="form-group">
                     <label for="customerEmail">Email Address</label>
-                    <input type="email" id="customerEmail" name="customerEmail" placeholder="you@example.com" maxlength="254"
-                        autocomplete="email" required />
+                    <input type="email" id="customerEmail" name="customerEmail" placeholder="you@example.com"
+                        maxlength="254" autocomplete="email" required>
                 </div>
-        
+
                 <div class="form-group">
                     <label for="customerPhone">Phone Number</label>
                     <input type="tel" id="customerPhone" name="customerPhone" placeholder="Enter your phone number"
-                        minlength="7" maxlength="20" autocomplete="tel" required />
+                        minlength="7" maxlength="20" autocomplete="tel" required>
                 </div>
-        
+
                 <div class="form-group">
-                    <label for="deliveryAddress">Delivery Address</label>
-                    <textarea id="deliveryAddress" name="deliveryAddress" placeholder="Enter your complete delivery address"
-                        minlength="5" maxlength="500" autocomplete="street-address" rows="4" required></textarea>
+                    <label for="deliveryCity">City / Sub-city</label>
+                    <input type="text" id="deliveryCity" name="deliveryCity" placeholder="e.g. Addis Ababa, Bole" maxlength="100"
+                        required>
                 </div>
-        
-                <button type="submit" id="place-order-button">
-                    Place Order
+                
+                <div class="form-group">
+                    <label for="deliveryArea">Area / Woreda</label>
+                    <input type="text" id="deliveryArea" name="deliveryArea" placeholder="Enter your area or woreda" maxlength="150"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="deliveryStreet">Street Address / Building / House Number</label>
+                    <input type="text" id="deliveryStreet" name="deliveryStreet" placeholder="Enter street, building or house number"
+                        maxlength="250" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="deliveryLocationUrl">Google Maps Location Link (Optional)</label>
+                    <input type="url" id="deliveryLocationUrl" name="deliveryLocationUrl"
+                        placeholder="Paste your Google Maps location link" maxlength="1000">
+                    <small>Open Google Maps, select your delivery location, and copy its link.</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="deliveryInstructions">Delivery Instructions (Optional)</label>
+                    <textarea id="deliveryInstructions" name="deliveryInstructions"
+                        placeholder="Nearby landmark, building name, floor, or other directions" maxlength="500" rows="3"></textarea>
+                </div>
+
+                <button type="submit" id="place-order-button" class="primary-button full-button">
+                    Place My Order
                 </button>
-        
-                <p id="checkout-message" role="status" aria-live="polite"></p>
+
+                <p id="checkout-message" class="form-message" role="status" aria-live="polite"></p>
             </form>
         </section>
-        <!-- MY ORDERS SECTION -->
-        <section id="my-orders">
-            <h2>My Orders</h2>
-            <p>Enter your checkout email address to view your orders.</p>
-        
-            <form id="order-search-form">
-                <div class="form-group">
-                    <label for="order-email">Email Address</label>
-                    <input type="email" id="order-email" placeholder="Enter your checkout email" maxlength="254"
-                        autocomplete="email" required />
-                </div>
-        
-                <button type="submit" id="find-orders-button">
-                    Find My Orders
-                </button>
-            </form>
-        
-            <p id="order-history-message" role="status" aria-live="polite"></p>
-        
-            <div id="order-history-list"></div>
-        
-            <div id="order-details"></div>
+
+        <!-- MY ORDERS -->
+        <section id="my-orders" class="section">
+            <div class="section-heading">
+                <span class="eyebrow">ORDER MANAGEMENT</span>
+                <h2>My Orders</h2>
+                <p>View your previous purchases and order details.</p>
+            </div>
+
+            <div class="panel orders-panel">
+                <form id="order-search-form">
+                    <div class="form-group">
+                        <label for="order-email">Checkout Email Address</label>
+                        <input type="email" id="order-email" placeholder="Enter your checkout email" maxlength="254"
+                            autocomplete="email" required>
+                    </div>
+
+                    <button type="submit" id="find-orders-button" class="primary-button">
+                        Find My Orders
+                    </button>
+                </form>
+
+                <p id="order-history-message" class="form-message" role="status" aria-live="polite"></p>
+
+                <div id="order-history-list"></div>
+                <div id="order-details"></div>
+            </div>
         </section>
-       
-
-
 
     </main>
 
-    <footer>
-        <p>CodeAlpha E-commerce Store — Learning Project</p>
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+            <a class="logo footer-logo" href="/">
+                <span class="logo-icon">E</span>
+                Endale<span>Store</span>
+            </a>
+
+            <p>A simple and modern shopping experience.</p>
+            <p class="copyright">
+                © 2026 Endale Store. CodeAlpha E-commerce Learning Project.
+            </p>
+        </div>
     </footer>
+
 </body>
 
 </html>
